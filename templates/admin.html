@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js" type="text/javascript"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+
+
+    <title>Admin Panel</title>
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="modal fade" id="article-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Article Detail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3 id="article-modal-title"></h3>
+                    <h4 id="article-modal-category"></h4>
+                    <h5 id="article-modal-lead"></h5>
+                    <p id="article-modal-content"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Article Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this article?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="delete-modal-button" data-article-id
+                        onclick="deleteArticle(this)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="add-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/article" method="POST" id="update-article-form" onsubmit="return validateData()">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category-select" name="category" required>
+                                <option value="" selected disabled>Select category</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lead-paragraph" class="form-label">Lead Paragraph</label>
+                            <textarea class="form-control" id="lead-paragraph" name="lead-paragraph" rows="3"
+                                required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="6" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Article</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="categoriesModalLabel">Categories editor</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="category-error">
+
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group" id="category-list">
+
+                    </ul>
+                    <hr>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="chartModalLabel">Articles per category chart</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="menu-toggle-button">
+        <input type="checkbox" name="menu-checkbox" id="menu-checkbox" onchange="openMenu(this)">
+        <label>&#9776;</label>
+    </div>
+
+    <div id="left-menu">
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary logout">Log out</a>
+        <div id="menu-items">
+            <button class="btn btn-primary" onclick="openAddModal()">New Article</button>
+            <button class="btn btn-primary" onclick="openCategoryModal()">Categories</button>
+            <button class="btn btn-primary" onclick="openUsersModal()">Users</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chartModal">Chart</button>
+        </div>
+    </div>
+
+    <div class="container pt-5">
+        <div class="row">
+            {% for article in articles %}
+            <div class="col-sm-12 col-md-6 col-xl-4 txt-color card-col">
+                <div class="card adminpanel mb-3 rounded-3" id="article-card">
+                    <div class="d-flex justify-content-center align-items-center img-div">
+                        <img class="img-content" src="https://i.ibb.co/Y7ZNfbJ/placeholder.png" alt="Card image cap">
+                    </div>
+                    <div class="card-body txt-color p-4 d-flex flex-column">
+                        <h5 class="card-title mb-3">{{ article.title }}</h5>
+                        <div class="card-text mt-auto">
+                            <div class="row">
+                                <div class="d-flex justify-content-between">
+                                    <button class="btn btn-primary" data-id="{{article._id}}"
+                                        onclick="showArticle(this)">More</button>
+                                    <div class="d-flex flex-row-reverse justify-content-between gap-3">
+                                        <i class="bi bi-trash3-fill edit-buttons" style="color:red;"
+                                            onclick="openDeleteModal('{{article._id}}')"></i>
+                                        <i class="bi bi-pencil-fill edit-buttons" style="color:black;"
+                                            onclick="openEditModal('{{article._id}}')"></i>
+                                        <i class="bi bi-box-arrow-down edit-buttons"
+                                            onclick="downloadArticle('{{article._id}}')" style="color:black;"></i>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        {{ pagination.info }}
+        {{ pagination.links }}
+    </div>
+    </div>
+
+</body>
+
+</html>

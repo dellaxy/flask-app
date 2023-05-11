@@ -114,14 +114,35 @@
                 </div>
                 <div class="modal-body">
                     <ul class="list-group" id="category-list">
-
                     </ul>
                     <hr>
+                    <form action="/category" method="POST" id="category-form">
+                        <div class="form-group">
+                            <input type="text" class="form-control mb-3" id="category-name" name="category-name"
+                                placeholder="Category name" required>
+                            <input type="submit" class="btn btn-primary" id="add-category" value="Add category">
+                            <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal fade" id="usersModal" tabindex="-1" aria-labelledby="usersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="usersModalLabel">Users list</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-5">
+                    <div class="accordion accordion-flush" id="users-list">
+
+                    </div>
                 </div>
             </div>
         </div>

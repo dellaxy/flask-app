@@ -4,7 +4,7 @@ from flask_paginate import Pagination, get_page_parameter
 from bson import ObjectId
 from flask_pymongo import pymongo
 
-CONNECTION_STRING = "mongodb+srv://bernath:Auticko123@ukf.fwchxj9.mongodb.net/?retryWrites=true&w=majority"
+CONNECTION_STRING = ""
 
 client = pymongo.MongoClient(CONNECTION_STRING)
 db = client.get_database("blog")
@@ -181,7 +181,7 @@ def categories():
     return jsonify(categories)
 
 
-@app.route("/category/<category_id>")
+@app.route("/category/<category_id>", methods=["GET"])
 def find_category(category_id):
     page = request.args.get(get_page_parameter(), type=int, default=1)
     per_page = 6
@@ -197,10 +197,11 @@ def find_category(category_id):
 @app.route("/category", methods=["POST"])
 def create_category():
     category = {
-        _id: ObjectId(),
-        "category": request.form.get("category")
+        "_id": ObjectId(),
+        "category": request.form.get("category-name"),
     }
     category_collection.insert_one(category)
+    return redirect("/")
 
 
 @app.route("/category/<category_id>", methods=["DELETE"])
@@ -213,7 +214,23 @@ def delete_category(category_id):
         return "", 200
 
 
+@app.route("/category/<category_id>", methods=["POST"])
+def update_category(category_id):
+    category = {
+        "category": request.form.get("category-name")
+    }
+    category_collection.update_one({"_id": ObjectId(category_id)}, {"$set": category})
+    return redirect("/")
 
+# Users ------------------------------------------------------------------------------------------------
+
+@app.route("/users", methods=["GET"])
+def get_users():
+    users = []
+    for user in user_collection.find({}, {"password": 0}):
+        user["_id"] = str(user.get("_id"))
+        users.append(user)
+    return jsonify(users)
 
 
 # Charts ------------------------------------------------------------------------------------------------

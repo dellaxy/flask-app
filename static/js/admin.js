@@ -2,8 +2,9 @@ $(document).ready(function () {
   $('.modal').on('hidden.bs.modal', function (e) {
     $("#update-article-form").trigger("reset");
     $('#category-select').empty();
-    $('#category-list').empty();
     $('#category-select').append('<option value="" disabled selected>Select a category</option>');
+
+    $('#category-list').empty();
   });
 });
 
@@ -102,7 +103,7 @@ function categoriesList() {
       data.forEach(category => {
         categories.append(`<li class="list-group-item d-flex justify-content-between"><p class="h6">${category.category}<p>
         <div class="d-flex justify-content-between gap-3">
-        <i class="bi bi-pencil-fill" style="color:black;" onclick="updateCategory('`+ category._id + `')"></i>
+        <i class="bi bi-pencil-fill" style="color:black;" onclick="updateCategory('${category._id}', '${category.category}')"></i>
         <i class="bi bi-trash3-fill" style="color:red;" onclick="deleteCategory('`+ category._id + `')"></i>
         </div>
         </li>`);
@@ -125,15 +126,67 @@ function deleteCategory(categoryId) {
       }
       else if (response.status === 400) {
         $('#category-error').append(`<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Oops!</strong> Cannot delete the category while articles are still associated with it.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`);
+        setTimeout(() => {
+          $('.alert').alert('close');
+        }, 10000);
       }
     });
-
 }
 
 
-function updateCategory(categoryId) {
-
+function openUsersModal() {
+  $('#usersModal').modal('show');
+  var users_list = $('#users-list');
+  fetch('/users')
+    .then(response => response.json())
+    .then(data => {
+      data.forEach(user => {
+        users_list.append(fillUser(user));
+      });
+    });
 }
+
+function fillUser(userData) {
+  let userType = userData.admin ? "Admin account" : "User account";
+  let userHTML = `
+  <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-heading`+ userData.username + `">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-`+ userData.username + `" aria-expanded="false"
+              aria-controls="flush-`+ userData.username + `">
+              `+ userData.username + `
+          </button>
+      </h2>
+      <div id="flush-`+ userData.username + `" class="accordion-collapse collapse" aria-labelledby="flush-heading` + userData.username + `"
+          data-bs-parent="#users-list">
+          <div class="accordion-body">
+              <ul class="list-group">
+                  <li class="list-group-item">@`+ userData.username + `</li>
+                  <li class="list-group-item">`+ userData.name + `</li>
+                  <li class="list-group-item">`+ userData.surname + `</li>
+                  <li class="list-group-item">`+ userType + `</li>
+              </ul>
+          </div>
+      </div>
+  </div>`;
+  return userHTML;
+}
+
+function updateCategory(categoryId, categoryName) {
+  category_form = $("#category-form");
+  category_form.attr("action", "/category/" + categoryId);
+  category_form.find("input[type='submit']").val("Update");
+  category_form.find("#category-name").val(categoryName);
+}
+
+function clearForm() {
+  category_form = $("#category-form");
+
+  category_form.attr("action", "/category");
+  category_form.find("input[type='submit']").val("Add Category");
+  category_form.find("#category-name").val("");
+}
+
 
 function downloadArticle(articleId) {
   fetch(`/article/${articleId}`, { method: 'GET' })

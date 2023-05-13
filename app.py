@@ -4,7 +4,7 @@ from flask_paginate import Pagination, get_page_parameter
 from bson import ObjectId
 from flask_pymongo import pymongo
 
-CONNECTION_STRING = "mongodb+srv://bernath:Password123@ukf.fwchxj9.mongodb.net/?retryWrites=true&w=majority"
+CONNECTION_STRING = ""
 
 client = pymongo.MongoClient(CONNECTION_STRING)
 db = client.get_database("blog")

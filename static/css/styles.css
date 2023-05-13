@@ -214,3 +214,8 @@ body {
     overflow-y: auto;
     max-height: 20em;
 }
+
+#users-list {
+    max-height: 20em;
+    overflow-y: auto;
+}

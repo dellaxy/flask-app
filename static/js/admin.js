@@ -5,6 +5,7 @@ $(document).ready(function () {
     $('#category-select').append('<option value="" disabled selected>Select a category</option>');
 
     $('#category-list').empty();
+    $('#users-list').empty();
   });
 });
 

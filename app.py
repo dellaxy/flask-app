@@ -4,7 +4,7 @@ from flask_paginate import Pagination, get_page_parameter
 from bson import ObjectId
 from flask_pymongo import pymongo
 
-CONNECTION_STRING = ""
+CONNECTION_STRING = "mongodb+srv://bernath:Password123@ukf.fwchxj9.mongodb.net/?retryWrites=true&w=majority"
 
 client = pymongo.MongoClient(CONNECTION_STRING)
 db = client.get_database("blog")
@@ -169,7 +169,8 @@ def get_article(article_id):
 @app.route("/article/<article_id>", methods=["DELETE"])
 def delete_article(article_id):
     result = article_collection.delete_one({"_id": ObjectId(article_id)})
-
+    if result.deleted_count == 1:
+        return jsonify({"success": True})
 # Categories ---------------------------------------------------------------------------------------------
 
 @app.route("/categories")
